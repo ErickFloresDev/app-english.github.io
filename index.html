@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexicon</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700;900&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Mulish', 'sans-serif'],
+                        secondary: ['Nunito', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { 
+            background-color: #f7f9fc; 
+            color: #1c1b1f; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        .m3-card {
+            background: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .m3-card:hover { transform: translateY(-2px); }
+        .m3-card:active {
+            transform: scale(0.98);
+            background: #f1f3f8;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Componente de Tarjeta de Palabra
+        const WordCard = ({ item }) => {
+            const [translation, setTranslation] = useState("");
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                const getTranslation = async () => {
+                    setLoading(true);
+                    try {
+                        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q=${encodeURIComponent(item.word)}`;
+                        const res = await fetch(url);
+                        const data = await res.json();
+                        setTranslation(data[0][0][0]);
+                    } catch (e) { setTranslation("..."); }
+                    finally { setLoading(false); }
+                };
+                getTranslation();
+            }, [item.word]);
+
+            return (
+                <div className="m3-card flex items-center justify-between p-4 rounded-2xl border border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+                    <a 
+                        className="mr-3 p-2 bg-blue-50 text-blue-600 rounded-full transition-colors"
+                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#81a9e9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-language"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6.371c0 4.418 -2.239 6.629 -5 6.629" /><path d="M4 6.371h7" /><path d="M5 9c0 2.144 2.252 3.908 6 4" /><path d="M12 20l4 -9l4 9" /><path d="M19.1 18h-6.2" /><path d="M6.694 3l.793 .582" /></svg>
+                    </a>
+                    <div className="flex-1">
+                        <h3 className="text-[13px] font-bold tracking-tight text-gray-500 uppercase mb-0">{item.word}</h3>
+                        <div className="h-5">
+                            {loading ? (
+                                <span className="text-[11px] font-secondary text-gray-400 animate-pulse">loading...</span>
+                            ) : (
+                                <span className="text-[14px] font-sans font-medium text-gray-400 leading-none">{translation}</span>
+                            )}
+                        </div>
+                    </div>
+                    <a 
+                        href={`https://www.wordreference.com/definition/${encodeURIComponent(item.word)}`} 
+                        target="_blank"
+                        className="ml-3 p-2 bg-gray-50 text-gray-400 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 4v16h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12" /><path d="M19 16h-12a2 2 0 0 0 -2 2" /><path d="M9 8h6" /></svg>
+                    </a>
+                </div>
+            );
+        };
+
+        // Hook para Scroll con Arrastre del Mouse
+        const useDragScroll = () => {
+            const ref = useRef(null);
+            const [isDragging, setIsDragging] = useState(false);
+            const [startX, setStartX] = useState(0);
+            const [scrollLeft, setScrollLeft] = useState(0);
+
+            const onMouseDown = (e) => {
+                setIsDragging(false); // Reset al iniciar
+                const startX = e.pageX - ref.current.offsetLeft;
+                setStartX(startX);
+                setScrollLeft(ref.current.scrollLeft);
+                
+                // Evento global para detectar si realmente se movió el mouse
+                const handleMouseMoveOnce = (moveEvent) => {
+                    if (Math.abs(moveEvent.pageX - e.pageX) > 5) {
+                        setIsDragging(true);
+                    }
+                };
+                window.addEventListener('mousemove', handleMouseMoveOnce, { once: true });
+            };
+
+            const stopDragging = () => setIsDragging(false);
+
+            const onMouseMove = (e) => {
+                if (e.buttons !== 1) return; // Solo si el click izquierdo está presionado
+                e.preventDefault();
+                const x = e.pageX - ref.current.offsetLeft;
+                const walk = (x - startX) * 2; 
+                ref.current.scrollLeft = scrollLeft - walk;
+            };
+
+            return {
+                ref,
+                events: {
+                    onMouseDown,
+                    onMouseLeave: stopDragging,
+                    onMouseUp: stopDragging,
+                    onMouseMove
+                },
+                isDragging
+            };
+        };
+
+        function App() {
+            const [menuData, setMenuData] = useState(null);
+            const [cat, setCat] = useState(null);
+            const [sub, setSub] = useState(null);
+            const [words, setWords] = useState([]);
+            const [fetching, setFetching] = useState(false);
+            
+            // Instancias del hook para cada menú
+            const navScroll = useDragScroll();
+            const subNavScroll = useDragScroll();
+
+            useEffect(() => {
+                fetch('data.json')
+                    .then(res => res.json())
+                    .then(data => {
+                        setMenuData(data);
+                        setCat(data.categories[0]);
+                        setSub(data.categories[0].subs[0]);
+                    })
+                    .catch(err => console.error("Error cargando JSON:", err));
+            }, []);
+
+            useEffect(() => {
+                if (!sub) return;
+                window.scrollTo(0, 0);
+                const fetchWords = async () => {
+                    setFetching(true);
+                    try {
+                        const r = await fetch(`https://api.datamuse.com/words?ml=${sub.q}`);
+                        const d = await r.json();
+                        setWords(d);
+                    } catch (e) { console.error(e); }
+                    finally { setFetching(false); }
+                };
+                fetchWords();
+            }, [sub]);
+
+            if (!menuData || !cat) return <div className="flex justify-center items-center h-screen font-secondary text-gray-400">Iniciando...</div>;
+
+            return (
+                <div className="max-w-4xl mx-auto min-h-screen flex flex-col bg-[#f7f9fc]">
+                    
+                    <div className="sticky top-0 z-50 bg-[#f7f9fc]/90 backdrop-blur-md pt-2 md:pt-6">
+                        <header className="px-6 mb-2 md:mb-4">
+                            <h1 className="text-[22px] font-black tracking-tighter text-gray-900">Lexicon</h1>
+                            <p className="text-[11px] font-secondary text-gray-400 font-semibold tracking-wide uppercase">Contexto & Traducción</p>
+                        </header>
+
+                        {/* Categorías Principales */}
+                        <div className="px-4 mb-3">
+                            <div 
+                                ref={navScroll.ref}
+                                {...navScroll.events}
+                                className={`flex bg-gray-200/50 p-1 rounded-2xl overflow-x-auto no-scrollbar gap-1 select-none ${navScroll.isDragging ? 'cursor-grabbing' : ''}`}
+                            >
+                                {menuData.categories.map(c => (
+                                    <button 
+                                        key={c.id} 
+                                        onClick={() => { if(!navScroll.isDragging) { setCat(c); setSub(c.subs[0]); } }}
+                                        className={`flex items-center gap-2 whitespace-nowrap px-5 py-2 text-[12px] font-bold rounded-xl transition-all ${
+                                            cat.id === c.id 
+                                            ? 'bg-white text-gray-900 shadow-sm' 
+                                            : 'text-gray-500 hover:text-gray-700'
+                                        }`}
+                                    >
+                                        <i className={`${c.icon} ${cat.id === c.id ? 'text-blue-600' : 'text-gray-400'} text-[14px]`}></i>
+                                        <span>{c.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Sub-categorías (Chips) */}
+                        <div 
+                            ref={subNavScroll.ref}
+                            {...subNavScroll.events}
+                            className={`px-4 flex gap-2 overflow-x-auto no-scrollbar pb-2 select-none ${subNavScroll.isDragging ? 'cursor-grabbing' : ''}`}
+                        >
+                            {cat.subs.map(s => (
+                                <button 
+                                    key={s.id} 
+                                    onClick={() => { if(!subNavScroll.isDragging) setSub(s); }}
+                                    className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
+                                        sub.id === s.id 
+                                        ? 'bg-blue-600 border-blue-600 text-white shadow-md' 
+                                        : 'bg-white border-gray-200 text-gray-500'
+                                    }`}
+                                >
+                                    {s.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <main className="flex-1 px-4 py-6">
+                        {fetching ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {[1,2,3,4,5,6].map(n => <div key={n} className="h-20 bg-gray-200/50 rounded-2xl animate-pulse"></div>)}
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {words.map((w, i) => <WordCard key={i} item={w} />)}
+                            </div>
+                        )}
+                    </main>
+
+                    <footer className="py-8 text-center">
+                        <p className="text-[9px] font-secondary text-gray-400 uppercase tracking-widest leading-loose">
+                            Dev • Erick Flores • Google Engine <br/> Lexicon App
+                        </p>
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

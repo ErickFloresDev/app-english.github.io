@@ -1,0 +1,154 @@
+{
+  "categories": [
+    {
+      "id": "cotidiano",
+      "label": "Cotidiano",
+      "icon": "fa-solid fa-house-user",
+      "subs": [
+        { "id": "gen", "label": "General", "q": "daily+routine" },
+        { "id": "sal", "label": "Salud", "q": "health+wellness" },
+        { "id": "hogar", "label": "Hogar", "q": "household+items" },
+        { "id": "comida", "label": "Cocina", "q": "cooking+ingredients" },
+        { "id": "ropa", "label": "Moda", "q": "clothing+accessories" },
+        { "id": "clima", "label": "Clima", "q": "weather+nature" },
+        { "id": "transp", "label": "Transporte", "q": "city+transport" },
+        { "id": "social", "label": "Social", "q": "relationships+family" }
+      ]
+    },
+    {
+      "id": "trabajo",
+      "label": "Trabajo",
+      "icon": "fa-solid fa-briefcase",
+      "subs": [
+        { "id": "dev", "label": "Software", "q": "programming+coding" },
+        { "id": "devops", "label": "DevOps", "q": "cloud+infrastructure" },
+        { "id": "med", "label": "Medicina", "q": "medical+doctor" },
+        { "id": "arch", "label": "Arquitectura", "q": "architecture+design" },
+        { "id": "eng", "label": "Ingeniería", "q": "mechanical+engineering" },
+        { "id": "manuf", "label": "Oficios/Taller", "q": "carpentry+welding" },
+        { "id": "serv", "label": "Hostelería", "q": "restaurant+service" },
+        { "id": "log", "label": "Logística", "q": "warehouse+shipping" }
+      ]
+    },
+    {
+      "id": "negocios",
+      "label": "Negocios",
+      "icon": "fa-solid fa-chart-line",
+      "subs": [
+        { "id": "mkt", "label": "Marketing", "q": "digital+advertising" },
+        { "id": "fin", "label": "Finanzas", "q": "investment+banking" },
+        { "id": "biz", "label": "Estrategia", "q": "business+strategy" },
+        { "id": "ventas", "label": "Ventas", "q": "retail+sales" },
+        { "id": "rh", "label": "Recursos H.", "q": "human+resources" },
+        { "id": "startup", "label": "Emprender", "q": "entrepreneurship+saas" },
+        { "id": "ecom", "label": "E-commerce", "q": "online+shopping" },
+        { "id": "legal", "label": "Legal", "q": "law+contracts" }
+      ]
+    },
+    {
+      "id": "tecnologia",
+      "label": "Tecnología",
+      "icon": "fa-solid fa-microchip",
+      "subs": [
+        { "id": "ai", "label": "IA/Machine L.", "q": "artificial+intelligence" },
+        { "id": "data", "label": "Data Science", "q": "big+data+analytics" },
+        { "id": "cyber", "label": "Ciberseguridad", "q": "hacking+security" },
+        { "id": "mobile", "label": "Móvil", "q": "smartphone+apps" },
+        { "id": "web", "label": "Web Design", "q": "ux+ui+design" },
+        { "id": "crypto", "label": "Blockchain", "q": "cryptocurrency+bitcoin" },
+        { "id": "hardware", "label": "Hardware", "q": "computer+components" },
+        { "id": "iot", "label": "IoT", "q": "smart+devices" }
+      ]
+    },
+    {
+      "id": "escuela",
+      "label": "Escuela",
+      "icon": "fa-solid fa-graduation-cap",
+      "subs": [
+        { "id": "acad", "label": "Estudio", "q": "study+skills" },
+        { "id": "lit", "label": "Literatura", "q": "poetry+prose" },
+        { "id": "ciencia", "label": "Ciencia", "q": "biology+physics" },
+        { "id": "hist", "label": "Historia", "q": "ancient+history" },
+        { "id": "math", "label": "Cálculo", "q": "algebra+geometry" },
+        { "id": "psico", "label": "Psicología", "q": "mental+health" },
+        { "id": "filo", "label": "Filosofía", "q": "logic+ethics" },
+        { "id": "univ", "label": "Universidad", "q": "campus+degree" }
+      ]
+    },
+    {
+      "id": "ocio",
+      "label": "Ocio",
+      "icon": "fa-regular fa-face-smile",
+      "subs": [
+        { "id": "viajes", "label": "Viajes", "q": "travel+tourism" },
+        { "id": "deportes", "label": "Deportes", "q": "fitness+athletics" },
+        { "id": "musica", "label": "Música", "q": "musical+instruments" },
+        { "id": "cine", "label": "Cine", "q": "cinema+production" },
+        { "id": "gaming", "label": "Gaming", "q": "esports+gaming" },
+        { "id": "foto", "label": "Fotografía", "q": "camera+optics" },
+        { "id": "baile", "label": "Danza", "q": "dance+performance" },
+        { "id": "hobbies", "label": "Hobbies", "q": "gardening+painting" }
+      ]
+    },
+    {
+      "id": "sociedad",
+      "label": "Sociedad",
+      "icon": "fa-solid fa-users",
+      "subs": [
+        { "id": "pol", "label": "Política", "q": "government+election" },
+        { "id": "eco", "label": "Economía", "q": "inflation+market" },
+        { "id": "soc", "label": "Sociología", "q": "community+culture" },
+        { "id": "env", "label": "Ambiente", "q": "ecology+pollution" },
+        { "id": "news", "label": "Noticias", "q": "journalism+media" },
+        { "id": "urb", "label": "Urbanismo", "q": "city+planning" },
+        { "id": "derechos", "label": "Derechos", "q": "human+rights" },
+        { "id": "religion", "label": "Religión", "q": "spirituality+faith" }
+      ]
+    },
+    {
+      "id": "comunicacion",
+      "label": "Comunicación",
+      "icon": "fa-solid fa-comments",
+      "subs": [
+        { "id": "soft", "label": "Habilidades", "q": "soft+skills" },
+        { "id": "public", "label": "Oratoria", "q": "public+speaking" },
+        { "id": "writing", "label": "Escritura", "q": "creative+writing" },
+        { "id": "lang", "label": "Idiomas", "q": "linguistics+grammar" },
+        { "id": "negoc", "label": "Negociación", "q": "conflict+resolution" },
+        { "id": "body", "label": "Lenguaje C.", "q": "body+language" },
+        { "id": "pr", "label": "RRPP", "q": "public+relations" },
+        { "id": "colab", "label": "Trabajo Equipo", "q": "collaboration" }
+      ]
+    },
+    {
+      "id": "viajes_mundo",
+      "label": "Destinos",
+      "icon": "fa-solid fa-earth-americas",
+      "subs": [
+        { "id": "hotel", "label": "Alojamiento", "q": "hotel+booking" },
+        { "id": "air", "label": "Aeropuerto", "q": "flight+aviation" },
+        { "id": "food_t", "label": "Gastronomía", "q": "local+cuisine" },
+        { "id": "sight", "label": "Turismo", "q": "landmark+monument" },
+        { "id": "nature", "label": "Aventura", "q": "hiking+camping" },
+        { "id": "beach", "label": "Playa", "q": "ocean+tropical" },
+        { "id": "mountain", "label": "Montaña", "q": "snow+skiing" },
+        { "id": "city_b", "label": "Ciudades", "q": "metropolis+traffic" }
+      ]
+    },
+    {
+      "id": "bienestar",
+      "label": "Bienestar",
+      "icon": "fa-solid fa-heart-pulse",
+      "subs": [
+        { "id": "gym", "label": "Gimnasio", "q": "weightlifting+gym" },
+        { "id": "yoga", "label": "Yoga", "q": "meditation+stretching" },
+        { "id": "diet", "label": "Nutrición", "q": "vitamins+diet" },
+        { "id": "sleep", "label": "Sueño", "q": "sleeping+rest" },
+        { "id": "mind", "label": "Mindfulness", "q": "zen+awareness" },
+        { "id": "skincare", "label": "Cuidado P.", "q": "skincare+grooming" },
+        { "id": "spa", "label": "Relajación", "q": "massage+therapy" },
+        { "id": "therapy", "label": "Terapia", "q": "counseling+mental" }
+      ]
+    }
+  ]
+}
