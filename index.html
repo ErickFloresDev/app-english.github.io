@@ -1,268 +1,1035 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lexicon</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;700;900&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lexicon — Vocabulario en Contexto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ───────────────────────────────────────────
+   TOKENS — Google Cloud / Classic Material
+─────────────────────────────────────────── */
+:root {
+  --c-primary:        #1a73e8;
+  --c-primary-dark:   #1558b0;
+  --c-primary-bg:     #e8f0fe;
+  --c-surface:        #ffffff;
+  --c-bg:             #f1f3f4;
+  --c-sidebar:        #f8f9fa;
+  --c-nav-active-bg:  #e8f0fe;
+  --c-text:           #202124;
+  --c-text-secondary: #5f6368;
+  --c-text-hint:      #909192;
+  --c-border:         #dadce0;
+  --c-divider:        #dcdddf;
+  --c-hover:          #f1f3f4;
+  --c-active:         #e8f0fe;
+  --c-chip-syn:       #e8f0fe;
+  --c-chip-syn-text:  #1a73e8;
+  --c-chip-trg:       #fce8e6;
+  --c-chip-trg-text:  #c5221f;
+  /* elevation */
+  --el-1: 0 1px 2px rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+  --el-2: 0 1px 2px rgba(60,64,67,.3), 0 2px 6px 2px rgba(60,64,67,.15);
+  /* sizes */
+  --header-h: 48px;
+  --sidebar-w: 220px;
+  --sidebar-w-m: 180px;
+}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+html, body { height: 100%; }
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Mulish', 'sans-serif'],
-                        secondary: ['Nunito', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
+body {
+  font-family: 'Roboto', sans-serif;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-size: 14px;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
 
-    <style>
-        body { 
-            background-color: #f7f9fc; 
-            color: #1c1b1f; 
-            -webkit-tap-highlight-color: transparent;
-        }
-        .m3-card {
-            background: #ffffff;
-            transition: all 0.2s ease;
-        }
-        .m3-card:hover { transform: translateY(-2px); }
-        .m3-card:active {
-            transform: scale(0.98);
-            background: #f1f3f8;
-        }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        html { scroll-behavior: smooth; }
-    </style>
+/* ───────────── SCROLLBAR ───────────── */
+.no-sb::-webkit-scrollbar { display: none; }
+.no-sb { -ms-overflow-style: none; scrollbar-width: none; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #bdc1c6; }
+::-webkit-scrollbar-thumb:hover { background: #9aa0a6; }
+
+/* ───────────── TOP HEADER ───────────── */
+#top-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: var(--header-h);
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+  display: flex; align-items: center;
+  padding: 0 16px;
+  gap: 0;
+  box-shadow: var(--el-1);
+}
+
+.header-logo {
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0;
+  width: var(--sidebar-w-m);
+  padding-right: 16px;
+  border-right: 1px solid var(--c-divider);
+  height: 100%;
+  text-decoration: none;
+}
+.header-logo-icon {
+  width: 28px; height: 28px;
+  background: var(--c-primary);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.header-logo-icon span { color: #fff; font-size: 13px; font-weight: 700; letter-spacing: -.5px; }
+.header-logo-text { font-size: 16px; font-weight: 500; color: var(--c-text); letter-spacing: -.2px; white-space: nowrap; }
+.header-logo-text small { font-size: 11px; font-weight: 400; color: var(--c-text-secondary); display: block; margin-top: -1px; }
+
+/* Search in header */
+.header-search-wrap {
+  flex: 1; max-width: 560px; margin-left: 24px;
+}
+.header-search {
+  display: flex; align-items: center; gap: 8px;
+  height: 36px;
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  padding: 0 12px;
+  min-width: 0;
+}
+.header-search:focus-within {
+  background: var(--c-surface);
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 1px var(--c-primary);
+}
+.header-search input {
+  min-width: 0;
+  flex: 1; border: none; outline: none; background: transparent;
+  font-family: 'Roboto', sans-serif; font-size: 14px; color: var(--c-text);
+  white-space: nowrap;      /* evita salto de línea */
+  overflow: hidden;         /* oculta el texto sobrante */
+  text-overflow: ellipsis;  /* muestra los ... */
+}
+.header-search input::placeholder { color: var(--c-text-hint); }
+
+.header-search-btn {
+  height: 36px; padding: 0 14px;
+  background: var(--c-primary); color: #fff; border: none; cursor: pointer;
+  font-family: 'Roboto', sans-serif; font-size: 14px; font-weight: 500;
+  white-space: nowrap; letter-spacing: .25px;
+  transition: background .15s;
+  flex-shrink: 0; margin-left: 8px;
+}
+.header-search-btn:hover { background: var(--c-primary-dark); }
+
+.header-right {
+  margin-left: auto; display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+}
+.header-icon-btn {
+  width: 36px; height: 36px; border: none; background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c-text-secondary);
+  transition: background .15s, color .15s;
+}
+.header-icon-btn:hover { background: var(--c-hover); color: var(--c-text); }
+
+/* ───────────── LAYOUT SHELL ───────────── */
+#app-shell {
+  display: flex;
+  padding-top: var(--header-h);
+  min-height: 100vh;
+}
+
+/* ───────────── SIDEBAR ───────────── */
+#sidebar {
+  width: var(--sidebar-w);
+  min-height: calc(100vh - var(--header-h));
+  background: var(--c-sidebar);
+  border-right: 1px solid var(--c-border);
+  position: fixed;
+  top: var(--header-h); bottom: 0; left: 0;
+  overflow-y: auto; overflow-x: hidden;
+  display: flex; flex-direction: column;
+  z-index: 100;
+  transition: width .22s cubic-bezier(.4,0,.2,1), border-color .22s;
+}
+#sidebar.collapsed {
+  width: 0;
+  border-right-color: transparent;
+}
+#sidebar.collapsed * { visibility: hidden; }
+
+/* Main content transition when sidebar collapses — handled in #main-content rule below */
+
+.sidebar-section-label {
+  font-size: 11px; font-weight: 500; letter-spacing: .8px;
+  text-transform: uppercase; color: var(--c-text-secondary);
+  padding: 16px 16px 6px;
+}
+
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  height: 36px; padding: 0 16px;
+  font-size: 14px; font-weight: 400; color: var(--c-text-secondary);
+  cursor: pointer; border: none; background: transparent; width: 100%;
+  text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: background .1s, color .1s;
+  border-left: 3px solid transparent;
+}
+.sidebar-item i { font-size: 14px; flex-shrink: 0; width: 16px; text-align: center; }
+.sidebar-item:hover { background: var(--c-hover); color: var(--c-text); }
+.sidebar-item.active {
+  background: var(--c-nav-active-bg); color: var(--c-primary);
+  font-weight: 500; border-left-color: var(--c-primary);
+}
+.sidebar-item.active i { color: var(--c-primary); }
+
+.sidebar-divider { height: 1px; background: var(--c-divider); margin: 8px 0; }
+
+/* ───────────── MAIN CONTENT ───────────── */
+#main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  transition: margin-left .22s cubic-bezier(.4,0,.2,1);
+}
+#main-content.full { margin-left: 0; }
+
+/* ───────────── SUB-NAV (breadcrumb + chips) ───────────── */
+#sub-nav {
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+  padding: 0 24px;
+  display: flex; align-items: center; gap: 8px;
+  height: 44px;
+  overflow-x: auto;
+  overflow-y: visible;
+  position: relative;
+}
+.sub-nav-chip {
+  display: inline-flex; align-items: center;
+  height: 28px; padding: 14px 12px;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface); color: var(--c-text-secondary);
+  font-size: 13px; font-weight: 400; cursor: pointer; white-space: nowrap;
+  transition: all .1s; flex-shrink: 0;
+}
+.sub-nav-chip:hover { background: var(--c-hover); color: var(--c-text); border-color: var(--c-text-secondary); }
+.sub-nav-chip.active {
+  background: var(--c-primary); border-color: var(--c-primary); color: #fff; font-weight: 500;
+}
+
+/* ───────────── CONTENT AREA ───────────── */
+#content-area {
+  flex: 1; padding: 20px 24px;
+}
+
+/* Section header */
+.section-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 16px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--c-divider);
+}
+.section-title { font-size: 18px; font-weight: 400; color: var(--c-text); letter-spacing: -.2px; }
+.section-count { font-size: 13px; color: var(--c-text-secondary); }
+
+/* ───────────── WORD CARD (classic) ───────────── */
+.word-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  cursor: pointer;
+  transition: box-shadow .15s;
+  overflow: hidden;
+}
+.word-card:hover { box-shadow: var(--el-1); }
+.word-card.open  { box-shadow: var(--el-2); border-color: var(--c-primary); }
+
+.card-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; gap: 12px;
+  user-select: none;
+}
+
+/* EN word */
+.card-en {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px; font-weight: 500; color: var(--c-text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* POS */
+.pos-tag {
+  font-size: 11px; font-weight: 500; letter-spacing: .3px;
+  padding: 1px 5px; display: inline-block; margin-top: 3px;
+}
+.pt-n   { background: #e8f0fe; color: #1a73e8; }
+.pt-v   { background: #e6f4ea; color: #137333; }
+.pt-adj { background: #fce8e6; color: #c5221f; }
+.pt-adv { background: #fef7e0; color: #b06000; }
+.pt-u   { background: var(--c-bg); color: var(--c-text-secondary); }
+
+/* Separator */
+.card-sep { width: 1px; height: 36px; background: var(--c-divider); flex-shrink: 0; }
+
+/* ES translation */
+.card-trans {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; flex-wrap: nowrap; gap: 4px;
+  overflow: hidden;
+}
+.t-main { font-size: 15px; font-weight: 400; color: var(--c-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-sep-dot { font-size: 14px; color: var(--c-text-hint); flex-shrink: 0; }
+.t-alt { font-size: 14px; color: var(--c-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+.t-more {
+  font-size: 11px; font-weight: 500; padding: 1px 6px;
+  background: var(--c-primary-bg); color: var(--c-primary);
+  flex-shrink: 0; white-space: nowrap; margin-left: 2px;
+}
+.t-loading { font-size: 14px; color: var(--c-text-hint); }
+
+/* Trailing actions */
+.card-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+.card-icon-btn {
+  width: 32px; height: 32px; border: none; background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--c-text-hint); transition: background .12s, color .12s;
+  text-decoration: none;
+}
+.card-icon-btn:hover { background: var(--c-hover); color: var(--c-primary); }
+.chevron { transition: transform .25s cubic-bezier(.4,0,.2,1); }
+.word-card.open .chevron { transform: rotate(180deg); }
+
+/* ───────────── EXPAND PANEL ───────────── */
+.expand-panel { max-height: 0; overflow: hidden; transition: max-height .3s cubic-bezier(.4,0,.2,1); }
+.expand-panel.open { max-height: 520px; }
+
+.expand-body {
+  padding: 12px 14px;
+  border-top: 1px solid var(--c-divider);
+  background: #fafbfc;
+}
+
+
+.word-card.open .expand-body {
+  margin-left: 0;
+}
+
+.exp-sec-label {
+  font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .6px;
+  color: var(--c-primary); margin-bottom: 6px; margin-top: 10px;
+}
+.exp-sec-label:first-child { margin-top: 0; }
+
+.def-row {
+  display: flex; gap: 8px; align-items: flex-start;
+  font-size: 14px; color: var(--c-text-secondary); line-height: 1.5; padding: 2px 0;
+}
+.def-idx { color: var(--c-text-hint); font-size: 12px; font-weight: 500; width: 14px; flex-shrink: 0; text-align: right; padding-top: 1px; }
+
+.chips-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip {
+  display: inline-block; font-size: 13px; padding: 3px 10px;
+  border: 1px solid var(--c-border); background: var(--c-surface); color: var(--c-text-secondary);
+  cursor: default;
+}
+.chip.syn { background: var(--c-chip-syn); border-color: #c5d8fb; color: var(--c-chip-syn-text); }
+.chip.trg { background: var(--c-chip-trg); border-color: #f5c6c4; color: var(--c-chip-trg-text); }
+
+/* ───────────── SKELETON ───────────── */
+.sk {
+  background: linear-gradient(90deg, var(--c-divider) 25%, var(--c-bg) 50%, var(--c-divider) 75%);
+  background-size: 200%;
+  animation: sk 1.4s infinite;
+}
+@keyframes sk { 0%{background-position:200% 0}100%{background-position:-200% 0} }
+
+.sk-card {
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+}
+
+/* ───────────── GRID ───────────── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .cards-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1280px) {
+  .cards-grid { grid-template-columns: repeat(4, 1fr); }
+}
+/* ───────────── EMPTY STATE ───────────── */
+.empty-state {
+  text-align: center; padding: 64px 24px;
+  color: var(--c-text-secondary);
+}
+.empty-state svg { opacity: .35; margin-bottom: 12px; }
+.empty-state p { font-size: 16px; font-weight: 400; }
+.empty-state small { font-size: 14px; color: var(--c-text-hint); }
+
+/* ───────────── CARD ANIM ───────────── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.card-anim { animation: fadeUp .18s ease both; }
+
+/* ═══════════════════════════════════════════
+   MOBILE DRAWER  (< 768px)
+═══════════════════════════════════════════ */
+
+/* Overlay backdrop */
+#mobile-backdrop {
+  display: none;
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(32,33,36,.45);
+  opacity: 0;
+  transition: opacity .25s;
+}
+#mobile-backdrop.show { opacity: 1; }
+
+/* Mobile drawer — slides over content */
+#mobile-drawer {
+  display: none;
+  position: fixed;
+  top: var(--header-h); bottom: 0; left: 0;
+  width: 85%; max-width: 300px;
+  background: var(--c-sidebar);
+  border-right: 1px solid var(--c-border);
+  overflow-y: auto; overflow-x: hidden;
+  z-index: 160;
+  box-shadow: 2px 0 8px rgba(60,64,67,.25);
+  transform: translateX(-100%);
+  transition: transform .25s cubic-bezier(.4,0,.2,1);
+  flex-direction: column;
+}
+#mobile-drawer.open { transform: translateX(0); }
+
+@media (max-width: 767px) {
+  /* Desktop sidebar hidden on mobile */
+  #sidebar { display: none !important; }
+  #main-content { margin-left: 0 !important; }
+  #content-area { padding: 12px; }
+
+  .header-logo { border-right: none; }
+  .header-search-wrap { margin-left: 8px; width: 50%;  }
+  .header-logo-text small { display: none; }
+
+  .section-header { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .expand-body { padding: 10px 12px 12px; }
+  .cards-grid { grid-template-columns: 1fr; }
+
+  /* Show mobile drawer elements */
+  #mobile-backdrop { display: block; pointer-events: none; }
+  #mobile-backdrop.show { pointer-events: all; }
+  #mobile-drawer { display: flex; }
+}
+</style>
 </head>
 <body>
-    <div id="root"></div>
+<div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
 
-        // Componente de Tarjeta de Palabra
-        const WordCard = ({ item }) => {
-            const [translation, setTranslation] = useState("");
-            const [loading, setLoading] = useState(true);
+/* ── DATA ── */
+const MENU = [
+  {id:"cotidiano", label:"Cotidiano", icon:"fa-solid fa-house-user", subs:[
+    {id:"gen",label:"General",q:"daily+routine"},{id:"sal",label:"Salud",q:"health+wellness"},
+    {id:"hogar",label:"Hogar",q:"household+items"},{id:"comida",label:"Cocina",q:"cooking+ingredients"},
+    {id:"ropa",label:"Moda",q:"clothing+accessories"},{id:"clima",label:"Clima",q:"weather+nature"},
+    {id:"transp",label:"Transporte",q:"city+transport"},{id:"social",label:"Social",q:"relationships+family"}]},
+  {id:"trabajo", label:"Trabajo", icon:"fa-solid fa-briefcase", subs:[
+    {id:"dev",label:"Software",q:"programming+coding"},{id:"devops",label:"DevOps",q:"cloud+infrastructure"},
+    {id:"med",label:"Medicina",q:"medical+doctor"},{id:"arch",label:"Arquitectura",q:"architecture+design"},
+    {id:"eng",label:"Ingeniería",q:"mechanical+engineering"},{id:"manuf",label:"Oficios",q:"carpentry+welding"},
+    {id:"serv",label:"Hostelería",q:"restaurant+service"},{id:"log",label:"Logística",q:"warehouse+shipping"}]},
+  {id:"negocios", label:"Negocios", icon:"fa-solid fa-chart-line", subs:[
+    {id:"mkt",label:"Marketing",q:"digital+advertising"},{id:"fin",label:"Finanzas",q:"investment+banking"},
+    {id:"biz",label:"Estrategia",q:"business+strategy"},{id:"ventas",label:"Ventas",q:"retail+sales"},
+    {id:"rh",label:"RR.HH.",q:"human+resources"},{id:"startup",label:"Emprender",q:"entrepreneurship+saas"},
+    {id:"ecom",label:"E-commerce",q:"online+shopping"},{id:"legal",label:"Legal",q:"law+contracts"}]},
+  {id:"tecnologia", label:"Tecnología", icon:"fa-solid fa-microchip", subs:[
+    {id:"ai",label:"IA / ML",q:"artificial+intelligence"},{id:"data",label:"Data Science",q:"big+data+analytics"},
+    {id:"cyber",label:"Seguridad",q:"hacking+security"},{id:"mobile",label:"Móvil",q:"smartphone+apps"},
+    {id:"web",label:"Web",q:"ux+ui+design"},{id:"crypto",label:"Blockchain",q:"cryptocurrency+bitcoin"},
+    {id:"hw",label:"Hardware",q:"computer+components"},{id:"iot",label:"IoT",q:"smart+devices"}]},
+  {id:"escuela", label:"Escuela", icon:"fa-solid fa-graduation-cap", subs:[
+    {id:"acad",label:"Estudio",q:"study+skills"},{id:"lit",label:"Literatura",q:"poetry+prose"},
+    {id:"cien",label:"Ciencia",q:"biology+physics"},{id:"hist",label:"Historia",q:"ancient+history"},
+    {id:"math",label:"Cálculo",q:"algebra+geometry"},{id:"psico",label:"Psicología",q:"mental+health"},
+    {id:"filo",label:"Filosofía",q:"logic+ethics"},{id:"univ",label:"Universidad",q:"campus+degree"}]},
+  {id:"ocio", label:"Ocio", icon:"fa-regular fa-face-smile", subs:[
+    {id:"viaj",label:"Viajes",q:"travel+tourism"},{id:"dep",label:"Deportes",q:"fitness+athletics"},
+    {id:"mus",label:"Música",q:"musical+instruments"},{id:"cine",label:"Cine",q:"cinema+production"},
+    {id:"gam",label:"Gaming",q:"esports+gaming"},{id:"foto",label:"Fotografía",q:"camera+optics"},
+    {id:"bail",label:"Danza",q:"dance+performance"},{id:"hobb",label:"Hobbies",q:"gardening+painting"}]},
+  {id:"sociedad", label:"Sociedad", icon:"fa-solid fa-users", subs:[
+    {id:"pol",label:"Política",q:"government+election"},{id:"eco",label:"Economía",q:"inflation+market"},
+    {id:"soc",label:"Sociología",q:"community+culture"},{id:"env",label:"Ambiente",q:"ecology+pollution"},
+    {id:"news",label:"Noticias",q:"journalism+media"},{id:"urb",label:"Urbanismo",q:"city+planning"},
+    {id:"der",label:"Derechos",q:"human+rights"},{id:"rel",label:"Religión",q:"spirituality+faith"}]},
+  {id:"bienestar", label:"Bienestar", icon:"fa-solid fa-heart-pulse", subs:[
+    {id:"gym",label:"Gimnasio",q:"weightlifting+gym"},{id:"yoga",label:"Yoga",q:"meditation+stretching"},
+    {id:"diet",label:"Nutrición",q:"vitamins+diet"},{id:"sleep",label:"Sueño",q:"sleeping+rest"},
+    {id:"mind",label:"Mindfulness",q:"zen+awareness"},{id:"skin",label:"Cuidado P.",q:"skincare+grooming"},
+    {id:"spa",label:"Relajación",q:"massage+therapy"},{id:"ther",label:"Terapia",q:"counseling+mental"}]},
+];
 
-            useEffect(() => {
-                const getTranslation = async () => {
-                    setLoading(true);
-                    try {
-                        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=es&dt=t&q=${encodeURIComponent(item.word)}`;
-                        const res = await fetch(url);
-                        const data = await res.json();
-                        setTranslation(data[0][0][0]);
-                    } catch (e) { setTranslation("..."); }
-                    finally { setLoading(false); }
-                };
-                getTranslation();
-            }, [item.word]);
+const POS_M = { n:'sust.', v:'verbo', adj:'adj.', adv:'adv.', u:'—' };
+const POS_C = { n:'pt-n',  v:'pt-v',  adj:'pt-adj', adv:'pt-adv', u:'pt-u' };
 
-            return (
-                <div className="m3-card flex items-center justify-between p-4 rounded-2xl border border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
-                    <a 
-                        className="mr-3 p-2 bg-blue-50 text-blue-600 rounded-full transition-colors"
-                    >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#81a9e9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-language"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6.371c0 4.418 -2.239 6.629 -5 6.629" /><path d="M4 6.371h7" /><path d="M5 9c0 2.144 2.252 3.908 6 4" /><path d="M12 20l4 -9l4 9" /><path d="M19.1 18h-6.2" /><path d="M6.694 3l.793 .582" /></svg>
-                    </a>
-                    <div className="flex-1">
-                        <h3 className="text-[13px] font-bold tracking-tight text-gray-500 uppercase mb-0">{item.word}</h3>
-                        <div className="h-5">
-                            {loading ? (
-                                <span className="text-[11px] font-secondary text-gray-400 animate-pulse">loading...</span>
-                            ) : (
-                                <span className="text-[14px] font-sans font-medium text-gray-400 leading-none">{translation}</span>
-                            )}
-                        </div>
-                    </div>
-                    <a 
-                        href={`https://www.wordreference.com/definition/${encodeURIComponent(item.word)}`} 
-                        target="_blank"
-                        className="ml-3 p-2 bg-gray-50 text-gray-400 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 4v16h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12" /><path d="M19 16h-12a2 2 0 0 0 -2 2" /><path d="M9 8h6" /></svg>
-                    </a>
+/* ── APIs ── */
+async function doTranslate(word) {
+  const key = `lx_tr_${word}`;
+  try {
+    const cached = localStorage.getItem(key);
+    if (cached) return JSON.parse(cached);
+  } catch(_) {}
+  try {
+    const r = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|es`);
+    const d = await r.json();
+    if (d.responseStatus === 200) {
+      const main = (d.responseData.translatedText || '').toLowerCase().trim();
+      const alts = [...new Set(
+        (d.matches || []).filter(m => m.translation && m.match >= 0.5)
+          .map(m => m.translation.toLowerCase().trim()).filter(t => t && t !== main)
+      )].slice(0, 5);
+      const result = { main, alts };
+      try { localStorage.setItem(key, JSON.stringify(result)); } catch(_) {}
+      return result;
+    }
+  } catch (_) {}
+  return { main: '—', alts: [] };
+}
+
+async function doDetails(word) {
+  try {
+    const [dR, sR, tR] = await Promise.all([
+      fetch(`https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&qe=sp&md=dp&max=1`),
+      fetch(`https://api.datamuse.com/words?rel_syn=${encodeURIComponent(word)}&max=8`),
+      fetch(`https://api.datamuse.com/words?rel_trg=${encodeURIComponent(word)}&max=8`),
+    ]);
+    const [dD, sD, tD] = await Promise.all([dR.json(), sR.json(), tR.json()]);
+    const det = dD[0] || {};
+    const defs = (det.defs || []).map(d => { const p = d.split('\t'); return { pos: p[0]||'u', text: p[1]||d }; });
+    const pos  = (det.tags || []).filter(t => ['n','v','adj','adv','u'].includes(t));
+    return { defs, pos, syn: sD.map(s=>s.word), trg: tD.map(t=>t.word) };
+  } catch (_) { return { defs:[], pos:[], syn:[], trg:[] }; }
+}
+
+/* ── DRAG SCROLL ── */
+function useDrag() {
+  const ref = useRef(null);
+  const s = useRef({ on:false, sx:0, sl:0, mv:false });
+  const onMouseDown = e => { s.current = { on:true, mv:false, sx:e.pageX-ref.current.offsetLeft, sl:ref.current.scrollLeft }; };
+  const onMouseMove = e => {
+    if (!s.current.on || e.buttons!==1) return; e.preventDefault();
+    const w = (e.pageX - ref.current.offsetLeft - s.current.sx)*1.8;
+    if (Math.abs(w)>5) s.current.mv=true;
+    ref.current.scrollLeft = s.current.sl - w;
+  };
+  const stop = () => { s.current.on=false; };
+  return { ref, ev:{ onMouseDown, onMouseMove, onMouseLeave:stop, onMouseUp:stop }, moved:()=>s.current.mv };
+}
+
+/* ── WORD CARD ── */
+const WordCard = ({ item, delay }) => {
+  const [open, setOpen] = useState(false);
+  const [trans, setTrans] = useState(null);
+  const [det, setDet]   = useState(null);
+  const [ldT, setLdT]   = useState(true);
+  const [ldD, setLdD]   = useState(false);
+  const fetched = useRef(false);
+  const obsRef  = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  // Opción 3 — solo traduce cuando la card es visible en pantalla
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setVisible(true); },
+      { threshold: 0.1 }
+    );
+    if (obsRef.current) obs.observe(obsRef.current);
+    return () => obs.disconnect();
+  }, []);
+
+  // Opción 2 — usa cache localStorage, solo llama API si no está cacheado
+  useEffect(() => {
+    if (!visible) return;
+    let ok = true;
+    setLdT(true); setTrans(null);
+    doTranslate(item.word).then(t => { if(ok){ setTrans(t); setLdT(false); } });
+    return () => { ok = false; };
+  }, [visible, item.word]);
+
+  const toggle = async () => {
+    const nx=!open; setOpen(nx);
+    if(nx && !fetched.current){
+      fetched.current=true; setLdD(true);
+      const d = await doDetails(item.word);
+      setDet(d); setLdD(false);
+    }
+  };
+
+  const main = trans?.main || '';
+  const alts = trans?.alts || [];
+  const vis  = alts.slice(0,1);
+  const extraAlts = open ? alts.slice(1) : [];
+
+  return (
+    <div ref={obsRef} className={`word-card card-anim${open?' open':''}`} style={{animationDelay:`${delay}ms`}} onClick={toggle}>
+      <div className="card-row">
+        <div className="card-en" style={{display:'flex',flexDirection:'column',justifyContent:'center'}}>
+          <span style={{fontSize:15,fontWeight:500,color:'var(--c-text)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',display:'block'}}>
+            {item.word}
+          </span>
+          <div className="card-trans">
+            {!visible || ldT ? (
+              <span className="t-loading">traduciendo…</span>
+            ) : (
+              <span className="text-gray-500 font-normal">{main}</span>
+            )}
+          </div>
+        </div>
+        <div className="flex gap-4">
+          <div className="card-sep"></div>
+          <div className="card-actions" onClick={e=>e.stopPropagation()}>
+            <a href={`https://www.wordreference.com/definition/${encodeURIComponent(item.word)}`} target="_blank" className="card-icon-btn" title="Ver en WordReference">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 4v16h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12"/>
+                <path d="M19 16h-12a2 2 0 0 0 -2 2"/>
+                <path d="M9 8h6"/>
+              </svg>
+            </a>
+            <button className="card-icon-btn" onClick={toggle}>
+              <svg className="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className={`expand-panel${open?' open':''}`}>
+        <div className="expand-body">
+          {ldD ? (
+            <div style={{display:'flex',flexDirection:'column',gap:7}}>
+              <div className="sk" style={{height:12,width:'65%'}}></div>
+              <div className="sk" style={{height:12,width:'45%'}}></div>
+              <div className="sk" style={{height:12,width:'55%'}}></div>
+            </div>
+          ) : det ? (<>
+            {det.defs.length>0 && (<>
+              <p className="exp-sec-label">Definiciones</p>
+              {det.defs.slice(0,4).map((d,i) => (
+                <div key={i} className="def-row">
+                  <span className="def-idx">{i+1}.</span>
+                  <span>
+                    <span className={`pos-tag ${POS_C[d.pos]||'pt-u'}`} style={{marginRight:6}}>{POS_M[d.pos]||d.pos}</span>
+                    {d.text}
+                  </span>
                 </div>
-            );
-        };
+              ))}
+            </>)}
+            {det.syn.length>0 && (<>
+              <p className="exp-sec-label">Sinónimos</p>
+              <div className="chips-row" style={{marginBottom:8}}>
+                {det.syn.map((s,i) => <span key={i} className="chip syn">{s}</span>)}
+              </div>
+            </>)}
+            {det.trg.length>0 && (<>
+              <p className="exp-sec-label">Palabras asociadas</p>
+              <div className="chips-row">
+                {det.trg.map((t,i) => <span key={i} className="chip trg">{t}</span>)}
+              </div>
+            </>)}
+            {det.defs.length===0&&det.syn.length===0&&det.trg.length===0 && (
+              <p style={{fontSize:14,color:'var(--c-text-hint)'}}>Sin información adicional.</p>
+            )}
+          </>) : null}
+        </div>
+      </div>
+    </div>
+  );
+};
 
-        // Hook para Scroll con Arrastre del Mouse
-        const useDragScroll = () => {
-            const ref = useRef(null);
-            const [isDragging, setIsDragging] = useState(false);
-            const [startX, setStartX] = useState(0);
-            const [scrollLeft, setScrollLeft] = useState(0);
+/* ── SKELETON ── */
+const SkCard = () => (
+  <div className="sk-card">
+    <div style={{width:140,flexShrink:0}}>
+      <div className="sk" style={{height:14,width:'70%'}}></div>
+    </div>
+    <div style={{width:1,height:36,background:'var(--c-divider)',flexShrink:0}}></div>
+    <div style={{flex:1}}>
+      <div className="sk" style={{height:14,width:'40%'}}></div>
+    </div>
+  </div>
+);
 
-            const onMouseDown = (e) => {
-                setIsDragging(false); // Reset al iniciar
-                const startX = e.pageX - ref.current.offsetLeft;
-                setStartX(startX);
-                setScrollLeft(ref.current.scrollLeft);
-                
-                // Evento global para detectar si realmente se movió el mouse
-                const handleMouseMoveOnce = (moveEvent) => {
-                    if (Math.abs(moveEvent.pageX - e.pageX) > 5) {
-                        setIsDragging(true);
-                    }
-                };
-                window.addEventListener('mousemove', handleMouseMoveOnce, { once: true });
-            };
+/* ── APP ── */
+function App() {
+  const [cat, setCat]   = useState(MENU[0]);
+  const [sub, setSub]   = useState(MENU[0].subs[0]);
+  const [words, setWords] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [sq, setSq]     = useState('');
+  const [sm, setSm]     = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileDrawer, setMobileDrawer] = useState(false);
+  const subn = useDrag();
+  const [freqFilter, setFreqFilter] = useState(1)
 
-            const stopDragging = () => setIsDragging(false);
+  const [dropOpen, setDropOpen] = useState(false);
+  const dropRef = useRef(null);
 
-            const onMouseMove = (e) => {
-                if (e.buttons !== 1) return; // Solo si el click izquierdo está presionado
-                e.preventDefault();
-                const x = e.pageX - ref.current.offsetLeft;
-                const walk = (x - startX) * 2; 
-                ref.current.scrollLeft = scrollLeft - walk;
-            };
+  useEffect(() => {
+    const handler = e => { if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
-            return {
-                ref,
-                events: {
-                    onMouseDown,
-                    onMouseLeave: stopDragging,
-                    onMouseUp: stopDragging,
-                    onMouseMove
-                },
-                isDragging
-            };
-        };
+  useEffect(() => {
+    if (mobileDrawer) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileDrawer]);
 
-        function App() {
-            const [menuData, setMenuData] = useState(null);
-            const [cat, setCat] = useState(null);
-            const [sub, setSub] = useState(null);
-            const [words, setWords] = useState([]);
-            const [fetching, setFetching] = useState(false);
+  const load = useCallback(async q => {
+    setLoading(true); setWords([]);
+    try {
+      const raw = await (await fetch(`https://api.datamuse.com/words?ml=${q}&md=f&max=100`)).json();
+      
+      const filtered = raw
+        .filter(w => w.word && w.word.length >= 2 && /^[a-z]+$/i.test(w.word))
+        .map(w => {
+          // Extraer frecuencia real del campo tags: ["f:12.34"]
+          const fTag = (w.tags || []).find(t => t.startsWith('f:'));
+          const freq = fTag ? parseFloat(fTag.slice(2)) : 0;
+          return { ...w, freq };
+        })
+        .sort((a, b) => b.freq - a.freq);
+
+      setWords(filtered);
+    } catch(_) {}
+    setLoading(false);
+  }, []);
+
+  // Filtrar palabras según el nivel seleccionado
+  const shuffle = arr => {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  const filteredWords = React.useMemo(() => {
+    const f = words.filter(w => {
+      if (freqFilter === 1) return (w.freq || 0) >= 10;
+      if (freqFilter === 2) return (w.freq || 0) >= 50;
+      return false;
+    });
+    return shuffle(f);
+  }, [words, freqFilter]);
+
+  useEffect(() => { if(!sm&&sub){ window.scrollTo(0,0); load(sub.q); } }, [sub,sm]);
+
+  const doSearch = useCallback(v => {
+    const q=v.trim(); if(!q){ setSm(false); return; }
+    setSm(true); window.scrollTo(0,0); load(encodeURIComponent(q));
+  }, [load]);
+
+  const selectCat = c => { if(sm){setSm(false);setSq('');} setCat(c); setSub(c.subs[0]); };
+  const selectSub = s => { setSm(false); setSub(s); };
+
+  const closeMobileDrawer = () => setMobileDrawer(false);
+  const selectCatMobile   = c => { selectCat(c); setMobileDrawer(false); };
+  const isMobile          = () => window.innerWidth < 768;
+  const toggleMenu        = () => { if(isMobile()){ setMobileDrawer(v=>!v); } else { setSidebarOpen(v=>!v); } };
+
+  const activeLabel = sm ? `"${sq}"` : `${cat.label} › ${sub.label}`;
+
+  return (<>
+    {/* ══════════ TOP HEADER ══════════ */}
+    <div id="top-header">
+      {/* Hamburger toggle */}
+      <button
+        className="header-icon-btn"
+        onClick={toggleMenu}
+        title="Menú"
+        style={{marginRight:4, flexShrink:0}}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="3" y1="6"  x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      {/* Logo */}
+      <div className="hidden md:block">
+        <div className="header-logo ">
+            <div className="header-logo-icon"><span>Lx</span></div>
+            <div className="header-logo-text">
+            Lexicons
+            <small>Vocabulario en Contexto</small>
+            </div>
+        </div>
+      </div>
+      
+
+      {/* Search */}
+      <div className="header-search-wrap">
+        <div className="header-search">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--c-text-hint)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            placeholder="Buscar palabra o concepto en inglés…"
+            value={sq}
+            onChange={e=>setSq(e.target.value)}
+            onKeyDown={e=>e.key==='Enter'&&doSearch(sq)}
+            className="line-clamp-1"
+          />
+          {sq && (
+            <button onClick={()=>{setSq('');setSm(false);}}
+              style={{border:'none',background:'none',cursor:'pointer',color:'var(--c-text-hint)',fontSize:18,lineHeight:1,padding:'0 2px',flexShrink:0}}>
+              ⨯
+            </button>
+          )}
+        </div>
+      </div>
+
+      <button className="header-search-btn" onClick={()=>doSearch(sq)}>
+        <span>Buscar</span>
+      </button>
+
+      {sm && (
+        <button onClick={()=>{setSm(false);setSq('');}}
+          className="hidden md:block"
+          style={{marginLeft:8,height:36,padding:'0 14px',border:'1px solid var(--c-border)',background:'var(--c-surface)',color:'var(--c-text-secondary)',cursor:'pointer',fontFamily:'Roboto',fontSize:14}}>
+          ← Volver
+        </button>
+      )}
+
+    </div>
+
+    {/* ══════════ SHELL ══════════ */}
+    <div id="app-shell">
+
+      {/* ── SIDEBAR ── */}
+      <nav id="sidebar" className={sidebarOpen ? '' : 'collapsed'}>
+        <div style={{padding:'8px 0 4px'}}>
+          {MENU.map(c => (
+            <button
+              key={c.id}
+              className={`py-6 text-[15px] sidebar-item${cat.id===c.id&&!sm?' active':''}`}
+              onClick={()=>selectCat(c)}
+            >
+              <i className={c.icon}></i>
+              <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{c.label}</span>
+            </button>
+          ))}
+        </div>
+        <div className="sidebar-divider"></div>
+        <div className="py-6 text-[16px]" style={{padding:'4px 0 16px',flexShrink:0}}>
+          <div className="sidebar-section-label">Fuentes</div>
+          <a href="https://www.datamuse.com/api/" target="_blank" className="sidebar-item" style={{textDecoration:'none'}}>
+            <i className="fa-solid fa-database"></i>
+            <span>Datamuse API</span>
+          </a>
+          <a href="https://mymemory.translated.net/" target="_blank" className="sidebar-item" style={{textDecoration:'none'}}>
+            <i className="fa-solid fa-language"></i>
+            <span>MyMemory</span>
+          </a>
+          <a href="https://www.wordreference.com/" target="_blank" className="sidebar-item" style={{textDecoration:'none'}}>
+            <i className="fa-solid fa-book"></i>
+            <span>WordReference</span>
+          </a>
+        </div>
+      </nav>
+
+      {/* ── MAIN ── */}
+      <div id="main-content" className={sidebarOpen ? '' : 'full'}>
+
+        {!sm && (
+          <div style={{position:'relative', display:'flex', alignItems:'center', background:'var(--c-surface)', borderBottom:'1px solid var(--c-border)', height:44}}>
             
-            // Instancias del hook para cada menú
-            const navScroll = useDragScroll();
-            const subNavScroll = useDragScroll();
-
-            useEffect(() => {
-                fetch('data.json')
-                    .then(res => res.json())
-                    .then(data => {
-                        setMenuData(data);
-                        setCat(data.categories[0]);
-                        setSub(data.categories[0].subs[0]);
-                    })
-                    .catch(err => console.error("Error cargando JSON:", err));
-            }, []);
-
-            useEffect(() => {
-                if (!sub) return;
-                window.scrollTo(0, 0);
-                const fetchWords = async () => {
-                    setFetching(true);
-                    try {
-                        const r = await fetch(`https://api.datamuse.com/words?ml=${sub.q}`);
-                        const d = await r.json();
-                        setWords(d);
-                    } catch (e) { console.error(e); }
-                    finally { setFetching(false); }
-                };
-                fetchWords();
-            }, [sub]);
-
-            if (!menuData || !cat) return <div className="flex justify-center items-center h-screen font-secondary text-gray-400">Iniciando...</div>;
-
-            return (
-                <div className="max-w-4xl mx-auto min-h-screen flex flex-col bg-[#f7f9fc]">
-                    
-                    <div className="sticky top-0 z-50 bg-[#f7f9fc]/90 backdrop-blur-md pt-2 md:pt-6">
-                        <header className="px-6 mb-2 md:mb-4">
-                            <h1 className="text-[22px] font-black tracking-tighter text-gray-900">Lexicon</h1>
-                            <p className="text-[11px] font-secondary text-gray-400 font-semibold tracking-wide uppercase">Contexto & Traducción</p>
-                        </header>
-
-                        {/* Categorías Principales */}
-                        <div className="px-4 mb-3">
-                            <div 
-                                ref={navScroll.ref}
-                                {...navScroll.events}
-                                className={`flex bg-gray-200/50 p-1 rounded-2xl overflow-x-auto no-scrollbar gap-1 select-none ${navScroll.isDragging ? 'cursor-grabbing' : ''}`}
-                            >
-                                {menuData.categories.map(c => (
-                                    <button 
-                                        key={c.id} 
-                                        onClick={() => { if(!navScroll.isDragging) { setCat(c); setSub(c.subs[0]); } }}
-                                        className={`flex items-center gap-2 whitespace-nowrap px-5 py-2 text-[12px] font-bold rounded-xl transition-all ${
-                                            cat.id === c.id 
-                                            ? 'bg-white text-gray-900 shadow-sm' 
-                                            : 'text-gray-500 hover:text-gray-700'
-                                        }`}
-                                    >
-                                        <i className={`${c.icon} ${cat.id === c.id ? 'text-blue-600' : 'text-gray-400'} text-[14px]`}></i>
-                                        <span>{c.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Sub-categorías (Chips) */}
-                        <div 
-                            ref={subNavScroll.ref}
-                            {...subNavScroll.events}
-                            className={`px-4 flex gap-2 overflow-x-auto no-scrollbar pb-2 select-none ${subNavScroll.isDragging ? 'cursor-grabbing' : ''}`}
-                        >
-                            {cat.subs.map(s => (
-                                <button 
-                                    key={s.id} 
-                                    onClick={() => { if(!subNavScroll.isDragging) setSub(s); }}
-                                    className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[11px] font-bold transition-all border ${
-                                        sub.id === s.id 
-                                        ? 'bg-blue-600 border-blue-600 text-white shadow-md' 
-                                        : 'bg-white border-gray-200 text-gray-500'
-                                    }`}
-                                >
-                                    {s.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <main className="flex-1 px-4 py-6">
-                        {fetching ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {[1,2,3,4,5,6].map(n => <div key={n} className="h-20 bg-gray-200/50 rounded-2xl animate-pulse"></div>)}
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {words.map((w, i) => <WordCard key={i} item={w} />)}
-                            </div>
-                        )}
-                    </main>
-
-                    <footer className="py-8 text-center">
-                        <p className="text-[9px] font-secondary text-gray-400 uppercase tracking-widest leading-loose">
-                            Dev • Erick Flores • Google Engine <br/> Lexicon App
-                        </p>
-                    </footer>
+            {/* Botón 3 puntos — fijo a la izquierda, FUERA del scroll */}
+            <div ref={dropRef} style={{flexShrink:0, zIndex:100, display:'flex', alignItems:'center', paddingLeft:16, paddingRight:8, background:'var(--c-surface)', height:'100%'}}>
+              <button
+                onClick={()=>setDropOpen(v=>!v)}
+                style={{width:28,height:28,border:'1px solid var(--c-border)',background:dropOpen?'var(--c-hover)':'var(--c-surface)',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--c-text-secondary)',flexShrink:0}}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="5" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/>
+                </svg>
+              </button>
+              {dropOpen && (
+                <div style={{position:'absolute',top:'calc(100% + 0px)',left:16,background:'var(--c-surface)',border:'1px solid var(--c-border)',boxShadow:'var(--el-2)',zIndex:400,minWidth:140}}>
+                  {[['Comunes',1],['Muy comunes',2]].map(([label,i]) => (
+                    <button
+                      key={i}
+                      onClick={()=>{ setFreqFilter(i); setDropOpen(false); }}
+                      style={{display:'flex',alignItems:'center',gap:8,width:'100%',padding:'9px 14px',border:'none',background:'transparent',cursor:'pointer',fontSize:13,color:freqFilter===i?'var(--c-primary)':'var(--c-text)',fontWeight:freqFilter===i?500:400,textAlign:'left',whiteSpace:'nowrap'}}
+                      onMouseEnter={e=>e.currentTarget.style.background='var(--c-hover)'}
+                      onMouseLeave={e=>e.currentTarget.style.background='transparent'}
+                    >
+                      {freqFilter===i
+                        ? <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        : <span style={{width:12,display:'inline-block'}}></span>
+                      }
+                      {label}
+                    </button>
+                  ))}
                 </div>
-            );
-        }
+              )}
+            </div>
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+            {/* Divisor */}
+            <div style={{width:1,height:24,background:'var(--c-divider)',flexShrink:0}}></div>
+
+            {/* Sub-nav scrollable */}
+            <div ref={subn.ref} {...subn.ev} className="no-sb" style={{display:'flex',alignItems:'center',gap:8,flex:1,overflowX:'auto',height:'100%',padding:'0 16px',userSelect:'none'}}>
+              {cat.subs.map(s => (
+                <button
+                  key={s.id}
+                  className={`text-[15px] sub-nav-chip${sub.id===s.id?' active':''}`}
+                  onClick={()=>{ if(!subn.moved()) selectSub(s); }}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Content */}
+        <div id="content-area">
+
+          {/* Section header */}
+          <div className="section-header">
+            <div>
+              <span className="section-title">{activeLabel}</span>
+            </div>
+            {!loading && filteredWords.length>0 && (
+              <span className="section-count">{filteredWords.length} resultados</span>
+            )}
+          </div>
+
+          {/* Cards grid */}
+          {loading ? (
+            <div className="cards-grid">
+              {[...Array(10)].map((_,i) => <SkCard key={i}/>)}
+            </div>
+          ) : filteredWords.length===0 ? (
+            <div className="empty-state">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--c-text-secondary)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{margin:'0 auto 12px',display:'block'}}>
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <p>Sin resultados</p>
+              <small>Intenta con otro término o categoría</small>
+            </div>
+          ) : (
+            <div className="cards-grid">
+              {filteredWords.map((w,i) => (
+                <WordCard key={`${w.word}-${i}`} item={w} delay={Math.min(i*20,280)}/>
+              ))}
+            </div>
+          )}
+
+        </div>
+
+        {/* Footer */}
+        <div style={{padding:'12px 24px',borderTop:'1px solid var(--c-divider)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <span style={{fontSize:12,color:'var(--c-text-hint)'}}>
+            Datamuse API · MyMemory Translate · WordReference
+          </span>
+          <span style={{fontSize:12,color:'var(--c-text-hint)'}}>Lexicon — Erick Flores</span>
+        </div>
+      </div>
+    </div>
+
+    {/* ══════════ MOBILE DRAWER ══════════ */}
+    {/* Backdrop */}
+    <div
+      id="mobile-backdrop"
+      className={mobileDrawer ? 'show' : ''}
+      onClick={closeMobileDrawer}
+    ></div>
+
+    {/* Drawer panel */}
+    <nav id="mobile-drawer" className={mobileDrawer ? 'open' : ''}>
+      {/* Drawer header */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 16px',borderBottom:'1px solid var(--c-border)',flexShrink:0}}>
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <div style={{width:24,height:24,background:'var(--c-primary)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+            <span style={{color:'#fff',fontSize:11,fontWeight:700}}>Lx</span>
+          </div>
+          <span style={{fontSize:15,fontWeight:500,color:'var(--c-text)'}}>Lexicons</span>
+        </div>
+        <button
+          onClick={closeMobileDrawer}
+          style={{width:32,height:32,border:'none',background:'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--c-text-secondary)'}}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* Categories */}
+      <div style={{padding:'8px 0 4px',flex:1,overflowY:'auto'}}>
+        {MENU.map(c => (
+          <button
+            key={c.id}
+            className={`py-6 text-[16px] sidebar-item${cat.id===c.id&&!sm?' active':''}`}
+            onClick={()=>selectCatMobile(c)}
+          >
+            <i className={c.icon}></i>
+            <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{c.label}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="sidebar-divider"></div>
+
+      {/* Sources */}
+      <div className="py-6 text-[16px]" style={{padding:'4px 0 16px',flexShrink:0}}>
+        <div className="sidebar-section-label">Fuentes</div>
+        <a href="https://www.datamuse.com/api/" target="_blank" className="sidebar-item" style={{textDecoration:'none'}} onClick={closeMobileDrawer}>
+          <i className="fa-solid fa-database"></i><span>Datamuse API</span>
+        </a>
+        <a href="https://mymemory.translated.net/" target="_blank" className="sidebar-item" style={{textDecoration:'none'}} onClick={closeMobileDrawer}>
+          <i className="fa-solid fa-language"></i><span>MyMemory</span>
+        </a>
+        <a href="https://www.wordreference.com/" target="_blank" className="sidebar-item" style={{textDecoration:'none'}} onClick={closeMobileDrawer}>
+          <i className="fa-solid fa-book"></i><span>WordReference</span>
+        </a>
+      </div>
+    </nav>
+  </>);
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
 </body>
 </html>
